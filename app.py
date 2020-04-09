@@ -1,5 +1,8 @@
-from flask import Flask, render_template, flask, redirect, url_for, session, logging
+from flask import Flask, render_template, flask, redirect, request, url_for, session, logging
 from data import Articles
+from flask_mysqldb import MySQL
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
 
@@ -22,6 +25,20 @@ def articles():
 def article(id):
     return render_template('article.html', id = id)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm(request)
+
+
+class RegisterForm(form):
+    name = StringField('Name', [validators.Length(min=1, max=50)])
+    usename = StringField('Username', [validators.Length(min=4, max=25)])
+    email = StringField('Email', [validators.Length(min=6, max=50)])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords do not match')
+    ])
+    confirm = PasswordField('Confirm Password')
 
 if __name__ == '__main__':
     app.run(debug=True)
