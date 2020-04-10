@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flask, redirect, request, url_for, session, logging
+from flask import Flask, render_template, redirect, request, url_for, session, logging
 from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
@@ -8,6 +8,16 @@ app = Flask(__name__)
 
 
 Articles = Articles()
+
+class RegisterForm(Form):
+    name = StringField('Name', [validators.Length(min=1, max=50)])
+    username = StringField('Username', [validators.Length(min=4, max=25)])
+    email = StringField('Email', [validators.Length(min=6, max=50)])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords do not match')
+    ])
+    confirm = PasswordField('Confirm Password')
 
 @app.route('/')
 def index():
@@ -27,18 +37,11 @@ def article(id):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm(request)
-
-
-class RegisterForm(form):
-    name = StringField('Name', [validators.Length(min=1, max=50)])
-    usename = StringField('Username', [validators.Length(min=4, max=25)])
-    email = StringField('Email', [validators.Length(min=6, max=50)])
-    password = PasswordField('Password', [
-        validators.DataRequired(),
-        validators.EqualTo('confirm', message='Passwords do not match')
-    ])
-    confirm = PasswordField('Confirm Password')
+    form = RegisterForm(request.form)
+    if request.method == 'POST' and form.validate():
+        pass
+    return render_template('register.html', form=form)
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
