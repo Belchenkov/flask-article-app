@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, url_for, session, logging
+from flask import Flask, flash, render_template, redirect, request, url_for, session, logging
 from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
@@ -57,7 +57,7 @@ def register():
         # Create cursor
         cur = mysql.connection.cursor()
 
-        cur.execute("INSER INTO users(name, email, username, password) VALUES (%s, %s, %s, %s)", (name, email, username, password))
+        cur.execute("INSERT INTO users(name, email, username, password) VALUES (%s, %s, %s, %s)", (name, email, username, password))
 
         # Commit to DB
         mysql.connection.commit()
@@ -73,4 +73,5 @@ def register():
     
 
 if __name__ == '__main__':
+    app.secret_key = 'secret123'
     app.run(debug=True)
