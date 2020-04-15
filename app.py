@@ -20,6 +20,7 @@ mysql = MySQL(app)
 
 Articles = Articles()
 
+# Register Form
 class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     username = StringField('Username', [validators.Length(min=4, max=25)])
@@ -29,6 +30,12 @@ class RegisterForm(Form):
         validators.EqualTo('confirm', message='Passwords do not match')
     ])
     confirm = PasswordField('Confirm Password')
+
+# Article Form
+class ArticleForm(Form):
+    title = StringField('Title', [validators.Length(min=1, max=200)])
+    body = TextAreaField('Body', [validators.Length(min=30)])
+    
 
 # Home
 @app.route('/')
@@ -134,8 +141,35 @@ def is_logged_in(f):
 def dashboard():
     return render_template('dashboard.html')
 
+# Add Article
+@app.route('/add_article', methods=['GET', 'POST'])
+@is_logged_in
+def add_article():
+    form = ArticleForm(request.form)
+    if request.method == 'POST' and form.validate():
+        # Prepare data
+        title = form.title.data
+        body = form.body.data
+
+        # Create Cursor
+        cur = mysql.connection.cursor()
+        # Execute
+        cur.execute("INSERT INTO articles(title, body, author) VALUES(%s, %s, %s)", (title, body, session['username']))
+        # Commit to DB
+        mysql.connection.commit()
+        # Close connection
+        cur.close()
+
+        # Send message
+        flash('Article Created', 'success')
+        
+        return redirect(url_for('dashboard'))
+        
+    return render_template('add_article', form=form)
+
 # Logout
 @app.route('/logout')
+@is_logged_in
 def logout():
     session.clear()
     flash('You are now logged out', 'success')
