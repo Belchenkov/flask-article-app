@@ -164,8 +164,8 @@ def add_article():
         flash('Article Created', 'success')
         
         return redirect(url_for('dashboard'))
-        
-    return render_template('add_article', form=form)
+
+    return render_template('add_article.html', form=form)
 
 # Logout
 @app.route('/logout')
