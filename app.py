@@ -139,7 +139,18 @@ def is_logged_in(f):
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
-    return render_template('dashboard.html')
+    cur = mysql.connection.cursor()
+    
+    result = cur.execute("SELECT * FROM articles")
+
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('dashboard.html', articles=articles)
+
+    return render_template('dashboard.html', msg='No Articles Found')
+
+    cur.close()
 
 # Add Article
 @app.route('/add_article', methods=['GET', 'POST'])
