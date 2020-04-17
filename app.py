@@ -240,6 +240,26 @@ def edit_article(id):
 
     return render_template('add_article.html', form=form)
 
+# Delete Article
+@app.route('/delete_article/<string:id>', methods=['POST'])
+@is_logged_in
+def delete_article(id):
+     # Create Cursor
+    cur = mysql.connection.cursor()
+
+    # Execute
+    cur.execute("DELETE FROM articles WHERE id=%s", [id])
+
+    # Commit to DB
+    mysql.connection.commit()
+    # Close connection
+    cur.close()
+
+    # Send message
+    flash('Article Deleted', 'success')
+
+    return redirect(url_for('dashboard'))
+
 # Logout
 @app.route('/logout')
 @is_logged_in
